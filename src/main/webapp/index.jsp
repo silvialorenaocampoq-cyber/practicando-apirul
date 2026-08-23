@@ -1,91 +1,81 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.apicolombia.PostItem, java.util.List" %>
+<%@ page import="java.net.http.HttpClient, java.net.http.HttpRequest, java.net.http.HttpResponse" %>
+<%@ page import="java.net.URI" %>
+<%@ page import="org.json.JSONArray, org.json.JSONObject" %>
+
+<%
+    // --- Petición GET a la API (igual que en la terminal) ---
+    String url = "https://jsonplaceholder.typicode.com/posts";
+
+    HttpClient cliente = HttpClient.newHttpClient();
+    HttpRequest peticion = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+
+    HttpResponse<String> respuesta = cliente.send(peticion, HttpResponse.BodyHandlers.ofString());
+    JSONArray posts = new JSONArray(respuesta.body());
+%>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Posts - API Colombia</title>
+    <title>Posts API</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-            background-color: #f4f4f4;
-        }
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f0f2f5; }
 
-        h1 {
-            color: #333;
-        }
+        h1 { color: #333; }
 
-        .contenedor {
+        .tabla-container {
             background: white;
-            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
+        table { width: 100%; border-collapse: collapse; }
 
-        th {
-            background-color: #4a90d9;
-            color: white;
-            padding: 10px;
-            text-align: left;
-        }
+        th { background: #3a7bd5; color: white; padding: 10px; text-align: left; }
 
-        td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #ddd;
-            vertical-align: top;
-        }
+        td { padding: 8px 10px; border-bottom: 1px solid #eee; }
 
-        tr:hover {
-            background-color: #f0f7ff;
-        }
-
-        .badge {
-            display: inline-block;
-            background: #4a90d9;
-            color: white;
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-size: 12px;
-        }
+        tr:hover td { background: #f5f8ff; }
     </style>
 </head>
 <body>
 
-<div class="contenedor">
     <h1>Posts de jsonplaceholder.typicode.com</h1>
-    <p>Total de posts: <strong><%= ((List<PostItem>) request.getAttribute("posts")).size() %></strong></p>
+    <p>Total: <strong><%= posts.length() %></strong> posts</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>User ID</th>
-                <th>Título</th>
-                <th>Contenido</th>
-            </tr>
-        </thead>
-        <tbody>
-            <%
-                List<PostItem> posts = (List<PostItem>) request.getAttribute("posts");
-                for (PostItem post : posts) {
-            %>
-            <tr>
-                <td><span class="badge"><%= post.getId() %></span></td>
-                <td><%= post.getUserId() %></td>
-                <td><%= post.getTitle() %></td>
-                <td><%= post.getBody() %></td>
-            </tr>
-            <% } %>
-        </tbody>
-    </table>
-</div>
+    <div class="tabla-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Título</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    // Recorre el JSON igual que info_respuesta() en la terminal
+                    for (int i = 0; i < posts.length(); i++) {
+                        JSONObject post = posts.getJSONObject(i);
+                        int id     = post.getInt("id");
+                        int userId = post.getInt("userId");
+                        String titulo = post.getString("title");
+                %>
+                <tr>
+                    <td><%= id %></td>
+                    <td><%= userId %></td>
+                    <td><%= titulo %></td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
 
 </body>
 </html>

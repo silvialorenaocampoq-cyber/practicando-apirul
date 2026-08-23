@@ -5,9 +5,8 @@
          http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
-    <!-- Redirigir la raíz del sitio al Servlet de posts -->
     <welcome-file-list>
-        <welcome-file>posts</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
 </web-app>
